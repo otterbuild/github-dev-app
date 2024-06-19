@@ -9,17 +9,17 @@ license = "MIT OR Apache-2.0"
 
 [dependencies]
 anyhow = "1.0.86"
+async-trait = "0.1.80"
 clap = { version = "4.5.7", features = ["derive"] }
 getset = "0.1.2"
 serde = { version = "1.0.203", features = ["derive"] }
 serde_json = "1.0.117"
+tokio = { version = "1.38.0", features = ["macros", "rt-multi-thread"] }
 typed-builder = "0.18.2"
 typed-fields = { version = "0.1.0", features = ["serde"] }
 
 [dev-dependencies]
-anyhow = "1.0.86"
 assert_cmd = "2.0.14"
-assert_fs = "1.1.1"
 indoc = "2.0.5"
 predicates = "3.1.0"
 pretty_assertions = "1.4.0"

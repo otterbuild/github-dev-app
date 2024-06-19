@@ -129,7 +129,6 @@ impl Manifest {
     ///
     /// This method initializes a manifest from a file. The file is expected to contain a JSON
     /// object that will get deserialized into a manifest.
-    #[allow(unused)] // TODO: Remove this attribute once the manifest is used
     pub fn from_file(path: &Path) -> Result<Self, Error> {
         let source = std::fs::read_to_string(path).context("failed to read manifest file")?;
 
@@ -140,7 +139,6 @@ impl Manifest {
     ///
     /// This method initializes a manifest from a string. The string is expected to be a JSON object
     /// that will get deserialized into a manifest.
-    #[allow(unused)] // TODO: Remove this attribute once the manifest is used
     pub fn from_str(source: &str) -> Result<Self, Error> {
         serde_json::from_str(source).context("failed to deserialize manifest")
     }
