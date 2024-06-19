@@ -6,6 +6,7 @@
 //! provides a simple way to register a new GitHub App from a manifest, add the app's secrets to the
 //! .env file, and update the app when the manifest changes.
 
+#![warn(clippy::missing_docs_in_private_items)]
 #![warn(missing_docs)]
 
 use clap::Parser;
