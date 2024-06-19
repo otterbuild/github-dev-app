@@ -13,6 +13,11 @@ workflows:
     jobs:
       - lint
       - style
+  - name: rust
+    jobs:
+      - lint
+      - style
+      - test
   - name: yaml
     jobs:
       - lint
