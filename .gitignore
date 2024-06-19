@@ -1,2 +1,7 @@
 # Cache for Prettier 4
 .prettiercache
+
+
+# Added by cargo
+
+/target
