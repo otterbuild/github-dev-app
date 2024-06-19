@@ -1,16 +1,21 @@
-# Template Repository
+# `github-dev-app`
 
-This repository is a template for creating new repositories. It comes
-preconfigured with a default developer experience, including pre-commit hooks
-and GitHub Actions.
+`github-dev-app` is a small library and command-line application that helps set
+up local development environments for GitHub Apps. It can create a new GitHub
+App from a manifest, manage the app's secrets, and update the app when the new
+permissions are added to the manifest.
 
-## Usage
+## License
 
-When creating a new repository in [otterbuild/den], set `from_template` to
-`true` to create the repository from this template.
+Licensed under either of
 
-```terraform
-from_template = true
-```
+- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
+- MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
 
-[otterbuild/den]: https://github.com/otterbuild/den
+at your option.
+
+## Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
+dual licensed as above, without any additional terms or conditions.
