@@ -8,3 +8,9 @@ repository = "https://github.com/otterbuild/github-dev-app"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
+clap = { version = "4.5.7", features = ["derive"] }
+
+[dev-dependencies]
+anyhow = "1.0.86"
+assert_cmd = "2.0.14"
+predicates = "3.1.0"
