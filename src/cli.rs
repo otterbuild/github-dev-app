@@ -14,6 +14,7 @@ use clap::{Parser, Subcommand};
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Parser)]
 #[command(version, about)]
 pub struct Args {
+    /// The command to execute
     #[command(subcommand)]
     command: Command,
 }
