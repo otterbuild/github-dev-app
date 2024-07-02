@@ -5,6 +5,7 @@ use async_trait::async_trait;
 
 use crate::cli::Args;
 use crate::manifest::Manifest;
+use crate::register::server::spawn_web_server_on_background_thread;
 use crate::register::RegisterArgs;
 use crate::Execute;
 
@@ -29,6 +30,7 @@ impl<'a> RegisterCommand<'a> {
 #[async_trait]
 impl<'a> Execute for RegisterCommand<'a> {
     async fn execute(&self, _global_args: &Args) -> Result<(), Error> {
+        let (_addr, _receiver) = spawn_web_server_on_background_thread().await;
         let manifest = Manifest::from_file(self.args.manifest())?;
 
         println!("{}", serde_json::to_string(&manifest)?);
