@@ -47,7 +47,7 @@ pub struct Manifest {
     /// The full URL to redirect to after a user initiates the registration of a GitHub App from a
     /// manifest
     #[builder(default, setter(strip_option))]
-    #[getset(get = "pub")]
+    #[getset(get = "pub", set = "pub")]
     #[serde(skip_serializing_if = "Option::is_none")]
     redirect_url: Option<RedirectUrl>,
 
