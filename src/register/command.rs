@@ -50,7 +50,8 @@ impl<'a> RegisterCommand<'a> {
 #[async_trait]
 impl<'a> Execute for RegisterCommand<'a> {
     async fn execute(&self, _global_args: &Args) -> Result<(), Error> {
-        let (addr, _receiver) = start_background_web_server(self.args.manifest()).await?;
+        let (addr, _receiver) =
+            start_background_web_server(self.args.manifest(), self.args.port()).await?;
 
         // Open a browser to start the registration process
         self.open_registration_form(&addr)?;
