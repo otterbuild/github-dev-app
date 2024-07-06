@@ -2,14 +2,14 @@
 
 use std::env::var;
 use std::net::SocketAddr;
-use std::thread::sleep;
 use std::time::Duration;
 
 use anyhow::{Context, Error};
 use async_trait::async_trait;
+use tokio::time::sleep;
 
 use crate::cli::Args;
-use crate::register::server::generate_and_serve_manifest_in_background_thread;
+use crate::register::server::start_background_web_server;
 use crate::register::RegisterArgs;
 use crate::Execute;
 
@@ -30,12 +30,13 @@ impl<'a> RegisterCommand<'a> {
         Self { args }
     }
 
-    /// Register a new GitHub App
+    /// Open the form that starts the registration process
     ///
-    /// This method is used to register a new GitHub App with the GitHub API. The app is registered
-    /// using the manifest that was generated from the manifest file, and the user will be
-    /// redirected back to the local web server to complete the registration process.
-    fn register_new_github_app(&self, addr: &SocketAddr) -> Result<(), Error> {
+    /// This method opens the form that starts the registration process in the user's default web
+    /// browser. The form sends the manifest to register a new GitHub App, allowing the user to
+    /// customize the name. After the user registers the app, they will be redirected back to the
+    /// local web server to complete the registration process.
+    fn open_registration_form(&self, addr: &SocketAddr) -> Result<(), Error> {
         // Skip opening the browser if running in CI
         if var("CI").is_ok() {
             return Ok(());
@@ -49,14 +50,13 @@ impl<'a> RegisterCommand<'a> {
 #[async_trait]
 impl<'a> Execute for RegisterCommand<'a> {
     async fn execute(&self, _global_args: &Args) -> Result<(), Error> {
-        let (addr, _receiver) =
-            generate_and_serve_manifest_in_background_thread(self.args.manifest()).await?;
+        let (addr, _receiver) = start_background_web_server(self.args.manifest()).await?;
 
         // Open a browser to start the registration process
-        self.register_new_github_app(&addr)?;
+        self.open_registration_form(&addr)?;
 
         // Wait for browser to open
-        sleep(Duration::from_secs(10));
+        sleep(Duration::from_secs(10)).await;
 
         Ok(())
     }
