@@ -46,7 +46,7 @@ struct AppState {
 /// for further processing.
 ///
 /// The server runs in a background task as to not block the main thread.
-pub async fn generate_and_serve_manifest_in_background_thread(
+pub async fn start_background_web_server(
     manifest_path: &Path,
 ) -> Result<(SocketAddr, Receiver<String>), Error> {
     // Get a random port for the web server
@@ -173,9 +173,7 @@ mod tests {
         let mut file = NamedTempFile::new().unwrap();
         file.write_all(manifest.as_bytes()).unwrap();
 
-        let (addr, _receiver) = generate_and_serve_manifest_in_background_thread(file.path())
-            .await
-            .unwrap();
+        let (addr, _receiver) = start_background_web_server(file.path()).await.unwrap();
         let callback_url = format!("http://{}/callback", addr);
 
         let body = Client::new()
@@ -200,9 +198,7 @@ mod tests {
         let mut file = NamedTempFile::new().unwrap();
         file.write_all(manifest.as_bytes()).unwrap();
 
-        let (addr, mut receiver) = generate_and_serve_manifest_in_background_thread(file.path())
-            .await
-            .unwrap();
+        let (addr, mut receiver) = start_background_web_server(file.path()).await.unwrap();
 
         let _response = Client::new()
             .post(format!(
