@@ -5,4 +5,5 @@ pub use self::command::*;
 
 mod args;
 mod command;
+mod form;
 mod server;

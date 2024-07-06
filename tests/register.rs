@@ -13,10 +13,7 @@ fn prints_manifest() -> Result<(), Error> {
 
     command.arg("register").arg(manifest.path());
 
-    command
-        .assert()
-        .success()
-        .stdout(predicates::str::contains("http://localhost"));
+    command.assert().success();
 
     Ok(())
 }

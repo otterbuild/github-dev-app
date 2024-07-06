@@ -1,0 +1,29 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Create a new GitHub App</title>
+  </head>
+
+  <body>
+    <h1>Create a new GitHub App</h1>
+
+    <p>
+      Click the button below to register a new GitHub App for local development.
+      You will be redirected to GitHub, where you can choose a unique name for
+      the app. Afterwards, you will be redirected back to complete the
+      registration process.
+    </p>
+
+    <form action="https://github.com/settings/apps/new" method="post">
+      <input type="hidden" name="manifest" id="manifest" /><br />
+      <input type="submit" value="Create GitHub App" />
+    </form>
+
+    <!-- @formatter:off -->
+    <script>
+      input = document.getElementById("manifest");
+      input.value = "{{ manifest }}";
+    </script>
+    <!-- @formatter:on -->
+  </body>
+</html>
