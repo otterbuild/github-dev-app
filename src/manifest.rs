@@ -18,6 +18,8 @@ name!(CallbackUrl);
 name!(SetupUrl);
 name!(Event);
 
+name!(SerializedManifest);
+
 /// Manifest for a GitHub App
 ///
 /// GitHub Apps can be created through GitHub's API by providing a manifest for the app. The
@@ -141,6 +143,16 @@ impl Manifest {
     /// that will get deserialized into a manifest.
     pub fn from_str(source: &str) -> Result<Self, Error> {
         serde_json::from_str(source).context("failed to deserialize manifest")
+    }
+}
+
+impl TryFrom<Manifest> for SerializedManifest {
+    type Error = Error;
+
+    fn try_from(manifest: Manifest) -> Result<Self, Self::Error> {
+        serde_json::to_string(&manifest)
+            .context("failed to serialize manifest")
+            .map(Into::into)
     }
 }
 
