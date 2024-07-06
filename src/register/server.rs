@@ -48,9 +48,11 @@ struct AppState {
 /// The server runs in a background task as to not block the main thread.
 pub async fn start_background_web_server(
     manifest_path: &Path,
+    port: Option<u16>,
 ) -> Result<(SocketAddr, Receiver<String>), Error> {
-    // Get a random port for the web server
-    let listener = TcpListener::bind("0.0.0.0:0".parse::<SocketAddr>().unwrap()).await?;
+    // Either use the given port or let the OS choose a random port
+    let interface = format!("0.0.0.0:{}", port.unwrap_or(0));
+    let listener = TcpListener::bind(interface.parse::<SocketAddr>().unwrap()).await?;
     let addr = listener.local_addr()?;
 
     let manifest = generate_and_serialize_manifest(manifest_path, &addr)?;
@@ -173,7 +175,9 @@ mod tests {
         let mut file = NamedTempFile::new().unwrap();
         file.write_all(manifest.as_bytes()).unwrap();
 
-        let (addr, _receiver) = start_background_web_server(file.path()).await.unwrap();
+        let (addr, _receiver) = start_background_web_server(file.path(), None)
+            .await
+            .unwrap();
         let callback_url = format!("http://{}/callback", addr);
 
         let body = Client::new()
@@ -198,7 +202,9 @@ mod tests {
         let mut file = NamedTempFile::new().unwrap();
         file.write_all(manifest.as_bytes()).unwrap();
 
-        let (addr, mut receiver) = start_background_web_server(file.path()).await.unwrap();
+        let (addr, mut receiver) = start_background_web_server(file.path(), None)
+            .await
+            .unwrap();
 
         let _response = Client::new()
             .post(format!(
