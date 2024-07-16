@@ -5,11 +5,15 @@ use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 use anyhow::{Context, Error};
 use async_trait::async_trait;
+use reqwest::Client;
+use url::Url;
 
 use crate::cli::Args;
-use crate::register::server::start_background_web_server;
-use crate::register::RegisterArgs;
 use crate::Execute;
+
+use super::app::App;
+use super::server::start_background_web_server;
+use super::RegisterArgs;
 
 /// Register a new GitHub App
 ///
@@ -48,18 +52,6 @@ impl<'a> RegisterCommand<'a> {
     }
 }
 
-/// Replace 0.0.0.0 with localhost
-///
-/// Modern browsers tend to handle `localhost` differently than an IP address. This function checks
-/// if a socket address uses `0.0.0.0` and if so, replaces it with `localhost`.
-fn replace_localhost(addr: &SocketAddr) -> String {
-    if addr.ip() == IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)) {
-        String::from("localhost")
-    } else {
-        addr.ip().to_string()
-    }
-}
-
 #[async_trait]
 impl<'a> Execute for RegisterCommand<'a> {
     async fn execute(&self, _global_args: &Args) -> Result<(), Error> {
@@ -74,10 +66,46 @@ impl<'a> Execute for RegisterCommand<'a> {
         self.open_registration_form(&addr)?;
 
         // Wait for the user to be redirected back to the local server with a temporary code
-        let _temporary_code = receiver.recv().await;
+        let temporary_code = receiver
+            .recv()
+            .await
+            .context("failed to receive temporary code from internal channel")?;
+
+        // Exchange the temporary code for the app secrets
+        let _app = exchange_temporary_code(self.args.github(), &temporary_code).await?;
 
         Ok(())
     }
+}
+
+/// Replace 0.0.0.0 with localhost
+///
+/// Modern browsers tend to handle `localhost` differently than an IP address. This function checks
+/// if a socket address uses `0.0.0.0` and if so, replaces it with `localhost`.
+fn replace_localhost(addr: &SocketAddr) -> String {
+    if addr.ip() == IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)) {
+        String::from("localhost")
+    } else {
+        addr.ip().to_string()
+    }
+}
+
+/// Exchange a temporary code for the app secrets
+///
+/// This function exchanges a temporary code for the app secrets. The temporary code is provided by
+/// GitHub after the user registers the app. The function sends the temporary code to GitHub and
+/// receives the app's id, secrets, and private key in return.
+async fn exchange_temporary_code(github: &Url, code: &str) -> Result<App, Error> {
+    let url = github.join(&format!("app-manifests/{code}/conversions"))?;
+
+    Client::new()
+        .post(url)
+        .send()
+        .await
+        .context("failed to convert temporary code")?
+        .json()
+        .await
+        .context("failed to parse conversion response")
 }
 
 #[cfg(test)]
