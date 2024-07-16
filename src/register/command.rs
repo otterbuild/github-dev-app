@@ -2,11 +2,9 @@
 
 use std::env::var;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
-use std::time::Duration;
 
 use anyhow::{Context, Error};
 use async_trait::async_trait;
-use tokio::time::sleep;
 
 use crate::cli::Args;
 use crate::register::server::start_background_web_server;
@@ -65,14 +63,14 @@ fn replace_localhost(addr: &SocketAddr) -> String {
 #[async_trait]
 impl<'a> Execute for RegisterCommand<'a> {
     async fn execute(&self, _global_args: &Args) -> Result<(), Error> {
-        let (addr, _receiver) =
+        let (addr, mut receiver) =
             start_background_web_server(self.args.manifest(), self.args.port()).await?;
 
         // Open a browser to start the registration process
         self.open_registration_form(&addr)?;
 
-        // Wait for browser to open
-        sleep(Duration::from_secs(10)).await;
+        // Wait for the user to be redirected back to the local server with a temporary code
+        let _temporary_code = receiver.recv().await;
 
         Ok(())
     }
