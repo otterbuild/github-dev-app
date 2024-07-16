@@ -1,6 +1,7 @@
 //! The form for starting the registration process
 
 use askama_axum::Template;
+use url::Url;
 
 use crate::manifest::SerializedManifest;
 
@@ -12,13 +13,16 @@ use crate::manifest::SerializedManifest;
 #[derive(Clone, Eq, PartialEq, Debug, Template)]
 #[template(path = "form.html", escape = "none")]
 pub struct Form {
+    /// The endpoint of the GitHub API
+    github: Url,
+
     /// The manifest for the GitHub App
     manifest: SerializedManifest,
 }
 
 impl Form {
     /// Create a new instance of the form
-    pub fn new(manifest: SerializedManifest) -> Self {
-        Self { manifest }
+    pub fn new(github: Url, manifest: SerializedManifest) -> Self {
+        Self { github, manifest }
     }
 }

@@ -11,6 +11,7 @@ use axum::Router;
 use serde::Deserialize;
 use tokio::net::TcpListener;
 use tokio::sync::mpsc::{channel, Receiver, Sender};
+use url::Url;
 
 use crate::manifest::{Manifest, SerializedManifest};
 use crate::register::form::Form;
@@ -21,7 +22,7 @@ use crate::register::form::Form;
 /// callback is called after the user has registered a new GitHub App from a manifest, and can be
 /// used to get the app's private key and secrets from GitHub.
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default, Deserialize)]
-pub(super) struct Params {
+struct Params {
     /// The temporary code returned by GitHub
     code: String,
 }
@@ -34,6 +35,9 @@ pub(super) struct Params {
 struct AppState {
     /// The channel to which to send the temporary code
     channel: Sender<String>,
+
+    /// The endpoint of the GitHub API
+    github: Url,
 
     /// The manifest to register the GitHub App
     manifest: SerializedManifest,
@@ -48,6 +52,7 @@ struct AppState {
 /// The server runs in a background task as to not block the main thread.
 pub async fn start_background_web_server(
     manifest_path: &Path,
+    github: Url,
     port: Option<u16>,
 ) -> Result<(SocketAddr, Receiver<String>), Error> {
     // Either use the given port or let the OS choose a random port
@@ -58,7 +63,7 @@ pub async fn start_background_web_server(
     let manifest = generate_and_serialize_manifest(manifest_path, &addr)?;
     let (sender, receiver) = channel(1);
 
-    let _server = tokio::spawn(run_axum_server(sender, listener, manifest));
+    let _server = tokio::spawn(run_axum_server(sender, listener, github, manifest));
 
     Ok((addr, receiver))
 }
@@ -89,12 +94,17 @@ fn generate_and_serialize_manifest(
 async fn run_axum_server(
     channel: Sender<String>,
     listener: TcpListener,
+    github: Url,
     manifest: SerializedManifest,
 ) -> Result<(), Error> {
     let app = Router::new()
         .route("/", get(show_form))
         .route("/callback", post(accept_temporary_code))
-        .with_state(AppState { channel, manifest });
+        .with_state(AppState {
+            channel,
+            github,
+            manifest,
+        });
 
     axum::serve(listener, app)
         .await
@@ -108,7 +118,7 @@ async fn run_axum_server(
 /// This function renders the form that is used to start the registration process for a new GitHub
 /// App. The form includes the manifest that was generated from the manifest file.
 async fn show_form(state: State<AppState>) -> impl IntoResponse {
-    Form::new(state.manifest.clone())
+    Form::new(state.github.clone(), state.manifest.clone())
 }
 
 /// Handle the callback after registering a new GitHub App
@@ -175,9 +185,13 @@ mod tests {
         let mut file = NamedTempFile::new().unwrap();
         file.write_all(manifest.as_bytes()).unwrap();
 
-        let (addr, _receiver) = start_background_web_server(file.path(), None)
-            .await
-            .unwrap();
+        let (addr, _receiver) = start_background_web_server(
+            file.path(),
+            Url::parse("https://api.github.com").unwrap(),
+            None,
+        )
+        .await
+        .unwrap();
         let callback_url = format!("http://{}/callback", addr);
 
         let body = Client::new()
@@ -202,9 +216,13 @@ mod tests {
         let mut file = NamedTempFile::new().unwrap();
         file.write_all(manifest.as_bytes()).unwrap();
 
-        let (addr, mut receiver) = start_background_web_server(file.path(), None)
-            .await
-            .unwrap();
+        let (addr, mut receiver) = start_background_web_server(
+            file.path(),
+            Url::parse("https://api.github.com").unwrap(),
+            None,
+        )
+        .await
+        .unwrap();
 
         let _response = Client::new()
             .post(format!(
