@@ -22,7 +22,7 @@
     <!-- @formatter:off -->
     <script>
       input = document.getElementById("manifest");
-      input.value = "{{ manifest }}";
+      input.value = JSON.stringify({{ manifest }});
     </script>
     <!-- @formatter:on -->
   </body>
