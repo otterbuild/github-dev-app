@@ -16,17 +16,19 @@ axum = "0.7.5"
 clap = { version = "4.5.7", features = ["derive"] }
 getset = "0.1.2"
 open = "5.2.0"
-reqwest = "0.12.5"
+reqwest = { version = "0.12.5", features = ["json"] }
+secrecy = { version = "0.8.0", features = ["serde"] }
 serde = { version = "1.0.203", features = ["derive"] }
 serde_json = "1.0.117"
 tokio = { version = "1.38.0", features = ["macros", "rt-multi-thread"] }
 typed-builder = "0.19.0"
-typed-fields = { version = "0.1.0", features = ["serde"] }
+typed-fields = { version = "0.1.0", features = ["secret", "serde"] }
 url = "2.5.2"
 
 [dev-dependencies]
 assert_cmd = "2.0.14"
 indoc = "2.0.5"
+mockito = "1.4.0"
 port_check = "0.2.1"
 predicates = "3.1.0"
 pretty_assertions = "1.4.0"

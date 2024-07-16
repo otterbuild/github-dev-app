@@ -3,6 +3,7 @@
 pub use self::args::*;
 pub use self::command::*;
 
+mod app;
 mod args;
 mod command;
 mod form;
