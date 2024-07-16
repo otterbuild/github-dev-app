@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use clap::Parser;
 use getset::{CopyGetters, Getters};
 use typed_builder::TypedBuilder;
+use url::Url;
 
 /// Command-line arguments for the `register` subcommand
 ///
@@ -12,18 +13,7 @@ use typed_builder::TypedBuilder;
 /// requires the path to the manifest file as an argument, and optionally accepts other arguments to
 /// customize the manifest.
 #[derive(
-    Clone,
-    Eq,
-    PartialEq,
-    Ord,
-    PartialOrd,
-    Hash,
-    Debug,
-    Default,
-    Parser,
-    CopyGetters,
-    Getters,
-    TypedBuilder,
+    Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Parser, CopyGetters, Getters, TypedBuilder,
 )]
 pub struct RegisterArgs {
     /// The path to the manifest file
@@ -31,6 +21,12 @@ pub struct RegisterArgs {
     #[builder(setter(into))]
     #[getset(get = "pub")]
     manifest: PathBuf,
+
+    /// The endpoint of the GitHub API
+    #[arg(long, default_value_t = Url::parse("https://api.github.com").unwrap())]
+    #[builder(setter(into))]
+    #[getset(get = "pub")]
+    github: Url,
 
     /// The port used by the embedded web server
     #[arg(long)]
