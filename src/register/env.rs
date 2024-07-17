@@ -68,10 +68,14 @@ fn update_env(old_env: &str, app: &App) -> String {
         "GITHUB_CLIENT_SECRET={}\n",
         app.client_secret().expose()
     ));
-    new_env.push_str(&format!(
-        "GITHUB_WEBHOOK_SECRET={}\n",
-        app.webhook_secret().expose()
-    ));
+
+    if let Some(webhook_secret) = app.webhook_secret() {
+        new_env.push_str(&format!(
+            "GITHUB_WEBHOOK_SECRET={}\n",
+            webhook_secret.expose()
+        ));
+    }
+
     new_env.push_str(&format!(
         "GITHUB_PRIVATE_KEY=\"{}\"\n",
         app.pem().expose().escape_default()
