@@ -36,6 +36,7 @@ async fn saves_private_key_and_secrets() -> Result<(), Error> {
         .with_body(indoc! {r#"
             {
               "id": 1,
+              "name": "github-dev-app",
               "client_id": "Iv1.8a61f9b3a7aba766",
               "client_secret": "1726be1638095a19edd134c77bde3aa2ece1e5d8",
               "webhook_secret": "e340154128314309424b7c8e90325147d99fdafa",
@@ -84,6 +85,7 @@ async fn saves_private_key_and_secrets() -> Result<(), Error> {
     assert_eq!(
         indoc! {r#"
         GITHUB_APP_ID=1
+        GITHUB_APP_NAME=github-dev-app
         GITHUB_CLIENT_ID="Iv1.8a61f9b3a7aba766"
         GITHUB_CLIENT_SECRET=1726be1638095a19edd134c77bde3aa2ece1e5d8
         GITHUB_WEBHOOK_SECRET=e340154128314309424b7c8e90325147d99fdafa

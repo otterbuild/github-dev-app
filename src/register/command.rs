@@ -48,6 +48,23 @@ impl<'a> RegisterCommand<'a> {
         open::that(format!("http://{}:{}", addr.ip(), addr.port()))
             .context("failed to open browser to start registration process")
     }
+
+    /// Open the page to install the app
+    ///
+    /// After a new app has been registered, the user can install it in their GitHub account. This
+    /// method opens the GitHub settings to install the app.
+    fn open_installation_page(&self, app: &App) -> Result<(), Error> {
+        // Skip opening the browser if running in CI
+        if var("CI").is_ok() {
+            return Ok(());
+        }
+
+        open::that(format!(
+            "https://github.com/settings/apps/{}/installations",
+            app.name()
+        ))
+        .context("failed to open browser to start installation process")
+    }
 }
 
 #[async_trait]
@@ -74,6 +91,9 @@ impl<'a> Execute for RegisterCommand<'a> {
 
         // Save secrets and private key to the .env file
         save_to_env(&app)?;
+
+        // Open the page to install the app
+        self.open_installation_page(&app)?;
 
         Ok(())
     }

@@ -7,6 +7,7 @@ use typed_builder::TypedBuilder;
 use typed_fields::{name, number, secret};
 
 number!(Id);
+name!(Name);
 name!(ClientId);
 secret!(ClientSecret);
 secret!(WebhookSecret);
@@ -24,6 +25,11 @@ pub struct App {
     #[cfg_attr(test, builder(setter(into)))]
     #[getset(get_copy = "pub")]
     id: Id,
+
+    /// The unique name for the app
+    #[cfg_attr(test, builder(setter(into)))]
+    #[getset(get = "pub")]
+    name: Name,
 
     /// The client ID for the app
     #[cfg_attr(test, builder(setter(into)))]
