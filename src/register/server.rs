@@ -56,7 +56,7 @@ pub async fn start_background_web_server(
     port: Option<u16>,
 ) -> Result<(SocketAddr, Receiver<String>), Error> {
     // Either use the given port or let the OS choose a random port
-    let interface = format!("0.0.0.0:{}", port.unwrap_or(0));
+    let interface = format!("127.0.0.1:{}", port.unwrap_or(0));
     let listener = TcpListener::bind(interface.parse::<SocketAddr>().unwrap()).await?;
     let addr = listener.local_addr()?;
 

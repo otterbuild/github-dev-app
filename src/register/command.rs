@@ -1,7 +1,7 @@
 //! Command to register a new GitHub App
 
 use std::env::var;
-use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use std::net::SocketAddr;
 
 use anyhow::{Context, Error};
 use async_trait::async_trait;
@@ -45,10 +45,7 @@ impl<'a> RegisterCommand<'a> {
             return Ok(());
         }
 
-        // Replace 0.0.0.0 with localhost to prevent warnings in the browser
-        let host = replace_localhost(addr);
-
-        open::that(format!("http://{}:{}", host, addr.port()))
+        open::that(format!("http://{}:{}", addr.ip(), addr.port()))
             .context("failed to open browser to start registration process")
     }
 }
@@ -82,18 +79,6 @@ impl<'a> Execute for RegisterCommand<'a> {
     }
 }
 
-/// Replace 0.0.0.0 with localhost
-///
-/// Modern browsers tend to handle `localhost` differently than an IP address. This function checks
-/// if a socket address uses `0.0.0.0` and if so, replaces it with `localhost`.
-fn replace_localhost(addr: &SocketAddr) -> String {
-    if addr.ip() == IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)) {
-        String::from("localhost")
-    } else {
-        addr.ip().to_string()
-    }
-}
-
 /// Exchange a temporary code for the app secrets
 ///
 /// This function exchanges a temporary code for the app secrets. The temporary code is provided by
@@ -114,27 +99,7 @@ async fn exchange_temporary_code(github: &Url, code: &str) -> Result<App, Error>
 
 #[cfg(test)]
 mod tests {
-    use pretty_assertions::assert_eq;
-
     use super::*;
-
-    #[test]
-    fn replace_localhost_with_local_ip() {
-        let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), 8080);
-
-        let host = replace_localhost(&addr);
-
-        assert_eq!("localhost", host);
-    }
-
-    #[test]
-    fn replace_localhost_with_remote_ip() {
-        let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(1, 2, 3, 4)), 8080);
-
-        let host = replace_localhost(&addr);
-
-        assert_eq!("1.2.3.4", host);
-    }
 
     #[test]
     fn trait_send() {
