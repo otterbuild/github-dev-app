@@ -66,7 +66,7 @@ async fn saves_private_key_and_secrets() -> Result<(), Error> {
 
     // Send temporary code
     Client::new()
-        .post("http://localhost:64001/callback?code=otters-are-the-cutest")
+        .get("http://localhost:64001/callback?code=otters-are-the-cutest")
         .send()
         .await
         .expect("failed to send temporary code");

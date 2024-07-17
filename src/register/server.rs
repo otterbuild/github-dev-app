@@ -6,7 +6,7 @@ use std::path::Path;
 use anyhow::{Context, Error};
 use axum::extract::{Query, State};
 use axum::response::IntoResponse;
-use axum::routing::{get, post};
+use axum::routing::get;
 use axum::Router;
 use serde::Deserialize;
 use tokio::net::TcpListener;
@@ -99,7 +99,7 @@ async fn run_axum_server(
 ) -> Result<(), Error> {
     let app = Router::new()
         .route("/", get(show_form))
-        .route("/callback", post(accept_temporary_code))
+        .route("/callback", get(accept_temporary_code))
         .with_state(AppState {
             channel,
             github,
@@ -225,13 +225,13 @@ mod tests {
         .unwrap();
 
         let _response = Client::new()
-            .post(format!(
+            .get(format!(
                 "http://{}/callback?code=otters-are-the-cutest",
                 addr
             ))
             .send()
             .await
-            .expect("failed to execute POST /callback request");
+            .expect("failed to execute GET /callback request");
 
         assert_eq!(Some("otters-are-the-cutest".into()), receiver.recv().await);
     }
