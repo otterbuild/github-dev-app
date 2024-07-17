@@ -12,6 +12,7 @@ use crate::cli::Args;
 use crate::Execute;
 
 use super::app::App;
+use super::env::save_to_env;
 use super::server::start_background_web_server;
 use super::RegisterArgs;
 
@@ -72,7 +73,10 @@ impl<'a> Execute for RegisterCommand<'a> {
             .context("failed to receive temporary code from internal channel")?;
 
         // Exchange the temporary code for the app secrets
-        let _app = exchange_temporary_code(self.args.github(), &temporary_code).await?;
+        let app = exchange_temporary_code(self.args.github(), &temporary_code).await?;
+
+        // Save secrets and private key to the .env file
+        save_to_env(&app)?;
 
         Ok(())
     }
