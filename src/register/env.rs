@@ -43,6 +43,7 @@ fn update_env(old_env: &str, app: &App) -> String {
         .filter(|line| {
             for variable in [
                 "GITHUB_APP_ID",
+                "GITHUB_APP_NAME",
                 "GITHUB_CLIENT_ID",
                 "GITHUB_CLIENT_SECRET",
                 "GITHUB_WEBHOOK_SECRET",
@@ -63,6 +64,7 @@ fn update_env(old_env: &str, app: &App) -> String {
     }
 
     new_env.push_str(&format!("GITHUB_APP_ID={}\n", app.id()));
+    new_env.push_str(&format!("GITHUB_APP_NAME={}\n", app.name()));
     new_env.push_str(&format!("GITHUB_CLIENT_ID=\"{}\"\n", app.client_id()));
     new_env.push_str(&format!(
         "GITHUB_CLIENT_SECRET={}\n",
@@ -100,6 +102,7 @@ mod tests {
 
         let app = App::builder()
             .id(1)
+            .name("app")
             .client_id("client_id")
             .client_secret("client_secret")
             .webhook_secret("webhook_secret")
@@ -112,6 +115,7 @@ mod tests {
             indoc! {r#"
             DATABASE_URL=postgres://localhost/db
             GITHUB_APP_ID=1
+            GITHUB_APP_NAME=app
             GITHUB_CLIENT_ID="client_id"
             GITHUB_CLIENT_SECRET=client_secret
             GITHUB_WEBHOOK_SECRET=webhook_secret
