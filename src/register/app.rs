@@ -36,9 +36,9 @@ pub struct App {
     client_secret: ClientSecret,
 
     /// The webhook secret for the app
-    #[cfg_attr(test, builder(setter(into)))]
+    #[cfg_attr(test, builder(setter(into, strip_option)))]
     #[getset(get = "pub")]
-    webhook_secret: WebhookSecret,
+    webhook_secret: Option<WebhookSecret>,
 
     /// The private key for the app
     #[cfg_attr(test, builder(setter(into)))]
