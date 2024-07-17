@@ -14,7 +14,7 @@ use crate::manifest::SerializedManifest;
 #[template(path = "form.html", escape = "none")]
 pub struct Form {
     /// The endpoint of the GitHub API
-    github: Url,
+    form_endpoint: Url,
 
     /// The manifest for the GitHub App
     manifest: SerializedManifest,
@@ -23,6 +23,19 @@ pub struct Form {
 impl Form {
     /// Create a new instance of the form
     pub fn new(github: Url, manifest: SerializedManifest) -> Self {
-        Self { github, manifest }
+        let base_url = if github.domain() == Some("api.github.com") {
+            Url::parse("https://github.com").expect("failed to parse hard-coded URL")
+        } else {
+            github
+        };
+
+        let form_endpoint = base_url
+            .join("/settings/apps/new")
+            .expect("failed to parse hard-coded URL path");
+
+        Self {
+            form_endpoint,
+            manifest,
+        }
     }
 }
