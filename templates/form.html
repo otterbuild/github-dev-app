@@ -16,15 +16,11 @@
             <p>
               Click the button below to register a new GitHub App for local
               development. You will be redirected to GitHub, where you can
-              choose a unique name for the app. Afterwards, you will be
+              choose a unique name for the app. Afterward, you will be
               redirected back to complete the registration process.
             </p>
           </div>
-          <form
-            action="{{ github }}/settings/apps/new"
-            method="post"
-            class="mb-0"
-          >
+          <form action="{{ form_endpoint }}" method="post" class="mb-0">
             <input type="hidden" name="manifest" id="manifest" /><br />
             <input
               type="submit"
