@@ -87,11 +87,21 @@ impl<'a> Execute for RegisterCommand<'a> {
 async fn exchange_temporary_code(github: &Url, code: &str) -> Result<App, Error> {
     let url = github.join(&format!("app-manifests/{code}/conversions"))?;
 
-    Client::new()
+    let response = Client::new()
         .post(url)
+        .header("User-Agent", "otterbuild/github-dev-app")
         .send()
         .await
-        .context("failed to convert temporary code")?
+        .context("failed to convert temporary code")?;
+
+    if !response.status().is_success() {
+        return Err(anyhow::anyhow!(
+            "failed to convert temporary code with error {}",
+            response.text().await?
+        ));
+    }
+
+    response
         .json()
         .await
         .context("failed to parse conversion response")
