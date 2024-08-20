@@ -82,7 +82,7 @@ jobs:
     container:
       # Code coverage is run inside the tarpaulin container with elevated
       # privileges so that it can instrument the code and collect coverage data.
-      image: xd009642/tarpaulin:0.31.1
+      image: xd009642/tarpaulin:0.31.2
       options: --security-opt seccomp=unconfined
 
     steps:
